@@ -57,23 +57,6 @@ jobs:
         with:
           ssh_key: ${{ secrets.SSH_KEY }}
           key_file: id_ecdsa
-      - name: Upload to Telegram
-        run: |
-          BOT_TOKEN="${{ secrets.TG_BOT_TOKEN }}"
-          CHAT_ID="${{ steps.config.outputs.tg_chat_ids }}"
-          DOCUMENT_ENDPOINT="https://api.telegram.org/bot$BOT_TOKEN/sendDocument"
-
-          for file in build/*.img.gz; do
-            # Определяем имя файла и тип контента
-            filename=$(basename -- "$file")
-            mime_type=$(file --mime-type -b "$file")
-
-            # Отправляем запрос на отправку файла
-            curl -X POST $DOCUMENT_ENDPOINT \
-                 -F 'chat_id='"${CHAT_ID}"' \
-                 -F 'document=@'"$file"';type='"$mime_type"'' \
-                 -F 'caption=Новый GSI-образ готов: '"$filename"
-          done
       - name: Upload
         run: |
           ssh-keyscan frs.sourceforge.net >> ~/.ssh/known_hosts
